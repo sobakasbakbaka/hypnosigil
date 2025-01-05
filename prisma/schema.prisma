@@ -7,8 +7,39 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  ADMIN
+  MASTER
+}
+
+model Client {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  birthDate  DateTime
+  phone      String?
+  whatsapp   String?
+  telegram   String?
+  schedules  Schedule[] @relation("ClientSchedules")
+  userId     Int?
+  user       User?    @relation(fields: [userId], references: [id], name: "UserClients")
+}
+
+model Schedule {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  masterId  Int
+  master    User     @relation(fields: [masterId], references: [id], name: "UserSchedules")
+  clientId  Int
+  client    Client   @relation(fields: [clientId], references: [id], name: "ClientSchedules")
+}
+
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  phone     String?
+  role      Role
+  clients   Client[] @relation("UserClients")
+  schedules Schedule[] @relation("UserSchedules")
 }
